@@ -1,0 +1,498 @@
+Enter password: ******
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.0.26 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database if not exists webstore999;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| abc                |
+| asd                |
+| efg                |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| webstore           |
+| webstore00         |
+| webstore01         |
+| webstore02         |
+| webstore03         |
+| webstore04         |
+| webstore05         |
+| webstore06         |
+| webstore07         |
+| webstore08         |
+| webstore09         |
+| webstore66         |
+| webstore999        |
+| webstorexsw        |
+| webstorezaq        |
+| world              |
++--------------------+
+24 rows in set (0.01 sec)
+
+mysql> use webstore999;
+Database changed
+mysql> show tables;
+Empty set (0.01 sec)
+
+mysql> create table if not exists customer(
+    -> cno char(4) primary key,
+    -> cname varchar(3) not null,
+    -> birthdate date,
+    -> sex char(2),
+    -> address varchar(50) default"北京市"
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> show tables;
++-----------------------+
+| Tables_in_webstore999 |
++-----------------------+
+| customer              |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> desc customer;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| cno       | char(4)     | NO   | PRI | NULL    |       |
+| cname     | varchar(3)  | NO   |     | NULL    |       |
+| birthdate | date        | YES  |     | NULL    |       |
+| sex       | char(2)     | YES  |     | NULL    |       |
+| address   | varchar(50) | YES  |     | 北京市  |       |
++-----------+-------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+mysql> create table if not exists goods(
+    -> gno char(4) primary key,
+    -> gname varchar(20) not null,
+    -> price decimal check(price>0),
+    -> category varchar(4),
+    -> provider varchar(20),
+    -> storage tinyint check(storage>0)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> show tables;
++-----------------------+
+| Tables_in_webstore999 |
++-----------------------+
+| customer              |
+| goods                 |
++-----------------------+
+2 rows in set (0.01 sec)
+
+mysql> desc goods;
++----------+---------------+------+-----+---------+-------+
+| Field    | Type          | Null | Key | Default | Extra |
++----------+---------------+------+-----+---------+-------+
+| gno      | char(4)       | NO   | PRI | NULL    |       |
+| gname    | varchar(20)   | NO   |     | NULL    |       |
+| price    | decimal(10,0) | YES  |     | NULL    |       |
+| category | varchar(4)    | YES  |     | NULL    |       |
+| provider | varchar(20)   | YES  |     | NULL    |       |
+| storage  | tinyint       | YES  |     | NULL    |       |
++----------+---------------+------+-----+---------+-------+
+6 rows in set (0.01 sec)
+
+mysql> create table if not exists orders(
+    -> cno char(4),
+    -> foreign key(cno) references customer(cno),
+    -> gno char(4),
+    -> foreign key(gno) references goods(gno),
+    -> orderdate date,
+    -> amount tinyint check(amount>0),
+    -> primary key(cno,gno,orderdate)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> show tables;
++-----------------------+
+| Tables_in_webstore999 |
++-----------------------+
+| customer              |
+| goods                 |
+| orders                |
++-----------------------+
+3 rows in set (0.01 sec)
+
+mysql> desc orders;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| cno       | char(4) | NO   | PRI | NULL    |       |
+| gno       | char(4) | NO   | PRI | NULL    |       |
+| orderdate | date    | NO   | PRI | NULL    |       |
+| amount    | tinyint | YES  |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+
+mysql>  insert into customer values
+    -> ("C101","马栋梁","1990-05-20","男","辽宁大连"),
+    -> ("C102","田宇农","1988-12-09","女","北京市"),
+    -> ("C103","李欣洋",NULL,"女","湖南长沙"),
+    -> ("C201","王刚","1978-03-12","男","北京市"),
+    -> ("C202","杨光","1992-09-29",null,"浙江杭州");
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> insert into goods values
+    -> ("g001","佳洁士牙膏","8","日常用品",'宝洁',"98"),
+    -> ("g002","舒肤佳香皂","4.5","日常用品","宝洁","92"),
+    -> ("g003","ONLY牛仔裤","238","服装","天津凌致","23"),
+    -> ("g004","休闲装","735.00","服装","李宁公司","9"),
+    -> ("g005","IPHONE手机","5180.00","数码产品","苹果公司","20"),
+    -> ("g006","Canon相机","1087.50","数码产品","佳能公司","16"),
+    -> ("g007","数据库系统概论","33.50","图书","高等教育出版社","43"),
+    -> ("g008","JSP实用案例教程","35.00","图书","清华大学出版社","50");
+Query OK, 8 rows affected, 3 warnings (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 3
+
+mysql> insert into orders values
+    -> ("C101","G002","2007-12-19",3),
+    -> ("C101","G004","2008-10-3",1),
+    -> ("C102","G001","2008-11-25",2),
+    -> ("C103","G002","2009-1-10",5),
+    -> ("C201","G003","2009-3-23",2),
+    -> ("C201","G008","2009-4-8",10),
+    -> ("C201","G007","2009-5-27",7);
+Query OK, 7 rows affected (0.01 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+7
+
+mysql> alter table orders rename purchase;
+
+Query OK, 0 rows affected (0.02 sec)
+
+8
+mysql> alter table customer
+
+    -> add telephone char(13);
+
+Query OK, 0 rows affected (0.02 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from customer;
+
++------+--------+---------------------+------+----------+-----------+
+
+| cno  | cname  | birthdate           | sex  | address  | telephone |
+
++------+--------+---------------------+------+----------+-----------+
+
+| C101 | 马栋梁 | 1990-05-20 00:00:00 | 男   | 辽宁大连 | NULL      |
+
+| C102 | 田宇农 | 1988-12-09 00:00:00 | 女   | 北京市   | NULL      |
+
+| C103 | 李欣洋 | NULL                | 女   | 湖南长沙 | NULL      |
+
+| C201 | 王刚   | 1978-03-12 00:00:00 | 男   | 北京市   | NULL      |
+
+| C202 | 杨光   | 1992-09-29 00:00:00 | NULL | 浙江杭州 | NULL      |
+
++------+--------+---------------------+------+----------+-----------+
+
+5 rows in set (0.00 sec)
+
+
+
+9
+
+mysql> alter table customer
+
+    -> modify telephone char(30);
+
+Query OK, 5 rows affected (0.04 sec)
+
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+
+mysql> select * from customer;
+
++------+--------+---------------------+------+----------+-----------+
+
+| cno  | cname  | birthdate           | sex  | address  | telephone |
+
++------+--------+---------------------+------+----------+-----------+
+
+| C101 | 马栋梁 | 1990-05-20 00:00:00 | 男   | 辽宁大连 | NULL      |
+
+| C102 | 田宇农 | 1988-12-09 00:00:00 | 女   | 北京市   | NULL      |
+
+| C103 | 李欣洋 | NULL                | 女   | 湖南长沙 | NULL      |
+
+| C201 | 王刚   | 1978-03-12 00:00:00 | 男   | 北京市   | NULL      |
+
+| C202 | 杨光   | 1992-09-29 00:00:00 | NULL | 浙江杭州 | NULL      |
+
++------+--------+---------------------+------+----------+-----------+
+
+5 rows in set (0.00 sec)
+
+
+
+10
+
+mysql> alter table customer
+
+    -> change telephone tel char(30);
+
+Query OK, 0 rows affected (0.02 sec)
+
+Records: 0  Duplicates: 0  Warnin
+
+
+mysql> select * from customer;
+
++------+--------+---------------------+------+----------+------+
+
+| cno  | cname  | birthdate           | sex  | address  | tel  |
+
++------+--------+---------------------+------+----------+------+
+
+| C101 | 马栋梁 | 1990-05-20 00:00:00 | 男   | 辽宁大连 | NULL |
+
+| C102 | 田宇农 | 1988-12-09 00:00:00 | 女   | 北京市   | NULL |
+
+| C103 | 李欣洋 | NULL                | 女   | 湖南长沙 | NULL |
+
+| C201 | 王刚   | 1978-03-12 00:00:00 | 男   | 北京市   | NULL |
+
+| C202 | 杨光   | 1992-09-29 00:00:00 | NULL | 浙江杭州 | NULL |
+
++------+--------+---------------------+------+----------+------+
+
+5 rows in set (0.00 sec)
+
+
+
+11
+
+mysql> alter table customer
+
+    -> drop tel;
+
+Query OK, 0 rows affected (0.04 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+
+mysql> select * from customer;
+
++------+--------+---------------------+------+----------+
+
+| cno  | cname  | birthdate           | sex  | address  |
+
++------+--------+---------------------+------+----------+
+
+| C101 | 马栋梁 | 1990-05-20 00:00:00 | 男   | 辽宁大连 |
+
+| C102 | 田宇农 | 1988-12-09 00:00:00 | 女   | 北京市   |
+
+| C103 | 李欣洋 | NULL                | 女   | 湖南长沙 |
+
+| C201 | 王刚   | 1978-03-12 00:00:00 | 男   | 北京市   |
+
+| C202 | 杨光   | 1992-09-29 00:00:00 | NULL | 浙江杭州 |
+
++------+--------+---------------------+------+----------+
+
+5 rows in set (0.00 sec)
+
+
+
+12
+
+mysql> drop table orders;
+
+Query OK, 0 rows affected (0.03 sec)
+
+
+
+88
+
+mysql> insert into customer(cno,cname,sex,address)
+
+    -> values('C203','刘嘉怡','女','北京市');
+
+Query OK, 1 row affected (0.01 sec)
+
+
+
+89
+
+mysql> insert into goods(gno,gname,price,category,provider)
+
+    -> values('G009','纯牛奶',3.5,'食品',null);
+
+Query OK, 1 row affected (0.01 sec)
+
+
+
+90
+
+mysql> insert into goods values
+
+    -> ("G010","奥利奥饼干",5,"食品",null,null);
+
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into goods values
+
+    -> ("G011","可口可乐饮料",3.5,"食品","可口可乐",null);
+
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into goods values
+
+    -> ("G012","德芙巧克力",40.6,"食品","德芙",null);
+
+Query OK, 1 row affected (0.01 sec)
+
+
+
+91
+
+mysql> insert into orders(cno,gno,ordersdate,amount)
+
+    -> select cno,'G006','2010-3-15',1 from customer;
+
+Query OK, 6 rows affected (0.01 sec)
+
+Records: 6  Duplicates: 0  Warnings: 0
+
+
+
+92
+
+mysql> update customer
+
+    -> set address='吉林长春'
+
+    -> where cname='王刚';
+
+Query OK, 1 row affected (0.01 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+93
+
+mysql> update goods
+
+    -> set gname='JSP实例教程',price=40.00
+
+    -> where gname='JSP实用案例教程';
+
+Query OK, 1 row affected (0.00 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+94
+
+mysql> update goods
+
+    -> set price=price * 1.05
+
+    -> where category='日常用品';
+
+Query OK, 2 rows affected (0.01 sec)
+
+Rows matched: 2  Changed: 2  Warnings: 0
+
+
+
+95
+
+mysql> update orders
+
+    -> set ordersdate='2008-10-8'
+
+    -> where ordersdate='2008-10-3' and gno in
+
+    -> (select gno from goods where gname='休闲装');
+
+Query OK, 1 row affected (0.01 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+96
+
+mysql> delete from goods
+
+    -> where gname='iphone手机';
+
+Query OK, 1 row affected (0.01 sec)
+
+
+
+97
+
+mysql> delete from goods where gname='图书';
+
+Query OK, 0 rows affected (0.00 sec)
+
+
+
+98
+
+mysql> delete from orders;
+
+Query OK, 13 rows affected (0.01 sec)
+
+
+
+99
+
+mysql> delete from customer where cno not in(select cno from orders);
+
+Query OK, 6 rows affected (0.01 sec)
+
+
+
+100
+
+mysql> delete from orders
+
+    -> where cno in (
+
+    -> select cno from customer where cname='王刚')
+
+    -> and date(ordersdate)='2009-5-27';
+
+Query OK, 0 rows affected (0.00 sec)
+
+
+
+101
+
+mysql> delete from customer where cname='王刚';
+
+Query OK, 0 rows affected (0.00 sec)
+
+
